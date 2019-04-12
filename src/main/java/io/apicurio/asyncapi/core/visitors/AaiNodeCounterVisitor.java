@@ -1,7 +1,7 @@
-package visitors;
+package io.apicurio.asyncapi.core.visitors;
 
-import models.AaiDocument;
-import models.AaiInfo;
+import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiInfo;
 
 public class AaiNodeCounterVisitor implements IAaiNodeVisitor {
 	

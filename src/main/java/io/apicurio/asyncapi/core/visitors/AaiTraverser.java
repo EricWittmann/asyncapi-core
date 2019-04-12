@@ -1,8 +1,8 @@
-package visitors;
+package io.apicurio.asyncapi.core.visitors;
 
-import models.AaiDocument;
-import models.AaiInfo;
-import models.AaiNode;
+import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiInfo;
+import io.apicurio.asyncapi.core.models.AaiNode;
 
 public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	

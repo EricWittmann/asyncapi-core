@@ -1,0 +1,32 @@
+{
+  "name": "asyncapi-core",
+  "version": "${project.version}",
+  "description": "A library to read and write AsyncAPI documents.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EricWittmann/asyncapi-core"
+  },
+  "main": "bundles/asyncapi.umd.js",
+  "module": "index.js",
+  "typings": "index.d.ts",
+  "typescript": {
+    "definition": "index.d.ts"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "compile": "tsc -p ./tsconfig-package.json",
+    "package": "rimraf dist && tsc -p tsconfig-package.json && cpx package.json dist && cpx module/*.* dist && mkdirp ./dist/bundles && rollup -c rollup.config.js"
+  },
+  "dependencies": {
+    "core-js": "2.6.5"
+  },
+  "devDependencies": {
+    "cpx": "1.5.0",
+    "mkdirp": "0.5.1",
+    "rimraf": "2.6.3",
+    "rollup": "0.68.2",
+    "rollup-plugin-commonjs": "8.4.1",
+    "typescript": "3.4.3"
+  }
+}

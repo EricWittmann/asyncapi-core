@@ -1,9 +1,9 @@
-package main;
+package io.apicurio.asyncapi.core;
 
-import models.AaiDocument;
-import models.AaiInfo;
-import visitors.AaiNodeCounterVisitor;
-import visitors.AaiVisitorUtil;
+import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiInfo;
+import io.apicurio.asyncapi.core.visitors.AaiNodeCounterVisitor;
+import io.apicurio.asyncapi.core.visitors.AaiVisitorUtil;
 
 public class Tester {
 	

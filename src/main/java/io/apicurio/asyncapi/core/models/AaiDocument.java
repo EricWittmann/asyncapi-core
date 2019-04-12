@@ -1,6 +1,6 @@
-package models;
+package io.apicurio.asyncapi.core.models;
 
-import visitors.IAaiNodeVisitor;
+import io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor;
 
 public class AaiDocument extends AaiNode {
 	

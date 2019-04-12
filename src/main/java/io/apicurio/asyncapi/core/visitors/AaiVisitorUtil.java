@@ -1,6 +1,6 @@
-package visitors;
+package io.apicurio.asyncapi.core.visitors;
 
-import models.AaiNode;
+import io.apicurio.asyncapi.core.models.AaiNode;
 
 public class AaiVisitorUtil {
 	
