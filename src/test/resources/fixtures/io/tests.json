@@ -1,0 +1,4 @@
+[
+	{ "name": "Simplest", "test": "2.0/simple/simplest.json" },
+	{ "name": "Simple Info", "test": "2.0/simple/simple-info.json" }
+]
