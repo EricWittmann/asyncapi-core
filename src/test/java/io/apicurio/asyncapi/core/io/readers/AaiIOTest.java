@@ -21,13 +21,16 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.apicurio.asyncapi.core.io.writers.AaiWriter;
 import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.visitors.AaiVisitorUtil;
 
 /**
  * @author eric.wittmann@gmail.com
  */
-public class AaiReaderTest {
+public class AaiIOTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -35,7 +38,7 @@ public class AaiReaderTest {
      * Test method for {@link io.apicurio.asyncapi.core.io.readers.AaiReader#readDocument(java.lang.Object, io.apicurio.asyncapi.core.models.AaiDocument)}.
      */
     @Test
-    public void testReadDocument() throws Exception {
+    public void testReadAndWriteDocument() throws Exception {
         String source = "{\r\n" + 
                 "    \"asyncapi\": \"2.0.0\",\r\n" + 
                 "    \"id\": \"12345\",\r\n" + 
@@ -57,6 +60,11 @@ public class AaiReaderTest {
         Assert.assertEquals("API Title", document.info.title);
         Assert.assertEquals("1.0.0", document.info.version);
         Assert.assertEquals("This is the API description.", document.info.description);
+        
+        AaiWriter writer = new AaiWriter();
+        AaiVisitorUtil.visitTree(document, writer);
+        ObjectNode root = (ObjectNode) writer.getResult();
+        Assert.assertNotNull(root);
     }
 
 }

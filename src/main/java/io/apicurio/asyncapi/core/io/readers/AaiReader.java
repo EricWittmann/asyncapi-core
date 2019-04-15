@@ -34,7 +34,7 @@ public class AaiReader {
         node.asyncapi = asyncapi;
         node.id = id;
         if (info != null) {
-            node.info = new AaiInfo();
+            node.info = node.createInfo();
             this.readInfo(info, node.info);
         }
     }

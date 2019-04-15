@@ -17,11 +17,28 @@
 package io.apicurio.asyncapi.core.compat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * @author eric.wittmann@gmail.com
  */
 public class AaiJsonUtil {
+
+    private static final JsonNodeFactory factory = JsonNodeFactory.instance;
+
+    public static ObjectNode objectNode() {
+        return factory.objectNode();
+    }
+    public static ArrayNode arrayNode() {
+        return factory.arrayNode();
+    }
+    
+    /*
+     * Getters
+     */
     
     public static Object property(Object json, String propertyName) {
         JsonNode node = (JsonNode) json;
@@ -34,6 +51,24 @@ public class AaiJsonUtil {
             return null;
         } else {
             return propertyNode.asText();
+        }
+    }
+    
+    /*
+     * Setters
+     */
+    
+    public static void setProperty(Object json, String propertyName, Object propertyValue) {
+        ObjectNode node = (ObjectNode) json;
+        JsonNode value = (JsonNode) propertyValue;
+        node.set(propertyName, value);
+    }
+    
+    public static void setPropertyString(Object json, String propertyName, String propertyValue) {
+        if (propertyValue != null) {
+            ObjectNode node = (ObjectNode) json;
+            TextNode textNode = factory.textNode(propertyValue);
+            node.set(propertyName, textNode);
         }
     }
 
