@@ -1,9 +1,9 @@
 
 export default {
-    entry: 'dist/index.js',
-    dest: 'dist/bundles/asyncapi.umd.js',
-    format: 'umd',
-    moduleName: 'asyncapi',
-    globals: {
+    input: "dist/index.js",
+    output: {
+    	file: "dist/bundles/asyncapi.umd.js",
+    	format: "umd",
+    	name: "asyncapi"
     }
 };

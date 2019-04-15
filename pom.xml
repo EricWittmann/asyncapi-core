@@ -177,11 +177,23 @@
                     </execution>
                     <!-- Build+package the library -->
                     <execution>
+                        <id>ng test</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <workingDirectory>${basedir}/target/ts</workingDirectory>
+                            <arguments>test</arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Build+package the library -->
+                    <execution>
                         <id>ng build</id>
                         <goals>
                             <goal>yarn</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <configuration>
                             <workingDirectory>${basedir}/target/ts</workingDirectory>
                             <arguments>package</arguments>
