@@ -130,6 +130,7 @@
                     <fork>true</fork>
                 </configuration>
             </plugin>
+            <!-- Generate TS from Java -->
             <plugin>
                 <groupId>org.jsweet</groupId>
                 <artifactId>jsweet-maven-plugin</artifactId>
@@ -141,6 +142,9 @@
                     <module>umd</module>
                     <moduleResolution>classic</moduleResolution>
                     <tsOnly>true</tsOnly>
+                    <excludes>
+                        <exclude>**/_*/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -152,6 +156,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Copy TS env from src into target -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
@@ -174,6 +179,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Generate the core.ts file -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-corets</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.apicurio.asyncapi.core._build.GenerateCoreTs</mainClass>
+                    <arguments>
+                        <argument>${basedir}/target/ts/src</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <!-- Build the TS into a library bundle -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
