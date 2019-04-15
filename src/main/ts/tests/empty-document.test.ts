@@ -1,5 +1,8 @@
 ///<reference path="../node_modules/@types/jasmine/index.d.ts"/>
 
+import {AaiDocument} from "../src/io/apicurio/asyncapi/core/models/AaiDocument";
+import {AaiReader} from "../src/io/apicurio/asyncapi/core/io/readers/AaiReader";
+
 /**
  * @license
  * Copyright 2019 JBoss Inc
@@ -17,7 +20,7 @@
  * limitations under the License.
  */
 
-describe("Empty Test", () => {
+describe("TS Test", () => {
 
     it("String not null", () => {
         let thing: string = "hello";
@@ -26,6 +29,35 @@ describe("Empty Test", () => {
 
     it("Null", () => {
         expect(null).toBeNull();
+    });
+
+    it("Empty Document", () => {
+        let doc: AaiDocument = new AaiDocument();
+        doc.asyncapi = "2.0.0";
+        doc.id = "12345";
+        expect(doc).not.toBeNull();
+    });
+
+    it("Document Reader", () => {
+        let json: any = {
+            asyncapi: "2.0.0",
+            id: "12345",
+            info: {
+                title: "API Title",
+                version: "1.0.0",
+                description: "This is the API description."
+            }
+        };
+        let reader: AaiReader = new AaiReader();
+        let doc: AaiDocument = new AaiDocument();
+        reader.readDocument(json, doc);
+
+        expect(doc.asyncapi).toEqual("2.0.0");
+        expect(doc.id).toEqual("12345");
+        expect(doc.info).not.toBeNull();
+        expect(doc.info.title).toEqual("API Title");
+        expect(doc.info.version).toEqual("1.0.0");
+        expect(doc.info.description).toEqual("This is the API description.");
     });
 
 });
