@@ -8,6 +8,14 @@ export class AaiJsonUtil {
         return [];
     }
     
+    public static parseObject(json: any): any {
+        return json;
+    }
+
+    public static keys(json: any): string[] {
+        return Object.keys(json);
+    }
+
     public static property(json: any, propertyName: string): any {
         if (json[propertyName]) {
             return json[propertyName];

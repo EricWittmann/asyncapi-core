@@ -2,7 +2,7 @@ package io.apicurio.asyncapi.core.models;
 
 import io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor;
 
-public class AaiDocument extends AaiNode {
+public class AaiDocument extends AaiExtensibleNode {
 	
 	public String asyncapi;
 	public String id;

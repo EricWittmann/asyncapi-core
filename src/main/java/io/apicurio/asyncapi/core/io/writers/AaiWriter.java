@@ -22,6 +22,7 @@ import java.util.Map;
 import io.apicurio.asyncapi.core.compat.AaiJsonUtil;
 import io.apicurio.asyncapi.core.io.AaiConstants;
 import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiExtension;
 import io.apicurio.asyncapi.core.models.AaiInfo;
 import io.apicurio.asyncapi.core.models.AaiNode;
 import io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor;
@@ -105,6 +106,17 @@ public class AaiWriter implements IAaiNodeVisitor {
         AaiJsonUtil.setPropertyString(info, AaiConstants.PROP_VERSION, node.version);
         AaiJsonUtil.setPropertyString(info, AaiConstants.PROP_DESCRIPTION, node.description);
         AaiJsonUtil.setProperty(parent, AaiConstants.PROP_INFO, info);
+
+        this.updateIndex(node, info);
+    }
+    
+    /**
+     * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitExtension(io.apicurio.asyncapi.core.models.AaiExtension)
+     */
+    @Override
+    public void visitExtension(AaiExtension node) {
+        Object parent = this.lookupParentJson(node);
+        AaiJsonUtil.setProperty(parent, node.name, node.value);
     }
 
 }

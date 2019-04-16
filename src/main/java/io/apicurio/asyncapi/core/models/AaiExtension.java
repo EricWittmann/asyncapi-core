@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package io.apicurio.asyncapi.core.io;
+package io.apicurio.asyncapi.core.models;
+
+import io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor;
 
 /**
  * @author eric.wittmann@gmail.com
  */
-public class AaiConstants {
-    
-    public static final String EXTENSION_PREFIX = "x-";
+public class AaiExtension extends AaiNode {
 
-    public static final String PROP_ASYNCAPI = "asyncapi";
-    public static final String PROP_ID = "id";
-    public static final String PROP_INFO = "info";
-    public static final String PROP_TITLE = "title";
-    public static final String PROP_VERSION = "version";
-    public static final String PROP_DESCRIPTION = "description";
+    public String name;
+    public Object value;
 
+    /**
+     * @see io.apicurio.asyncapi.core.models.AaiNode#accept(io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor)
+     */
+    @Override
+    public void accept(IAaiNodeVisitor visitor) {
+        visitor.visitExtension(this);
+    }
 }

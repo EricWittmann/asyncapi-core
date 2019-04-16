@@ -16,15 +16,31 @@
 
 package io.apicurio.asyncapi.core.io.readers;
 
+import java.util.List;
+
 import io.apicurio.asyncapi.core.compat.AaiJsonUtil;
 import io.apicurio.asyncapi.core.io.AaiConstants;
 import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiExtensibleNode;
+import io.apicurio.asyncapi.core.models.AaiExtension;
 import io.apicurio.asyncapi.core.models.AaiInfo;
 
 /**
  * @author eric.wittmann@gmail.com
  */
 public class AaiReader {
+    
+    private void readExtensions(Object json, AaiExtensibleNode node) {
+        List<String> keys = AaiJsonUtil.keys(json);
+        for (String key : keys) {
+            if (key.startsWith(AaiConstants.EXTENSION_PREFIX)) {
+                AaiExtension extension = node.createExtension();
+                extension.name = key;
+                extension.value = AaiJsonUtil.property(json, key);
+                node.addExtension(key, extension);
+            }
+        }
+    }
 
     public void readDocument(Object json, AaiDocument node) {
         String asyncapi = AaiJsonUtil.propertyString(json, AaiConstants.PROP_ASYNCAPI);
@@ -37,6 +53,7 @@ public class AaiReader {
             node.info = node.createInfo();
             this.readInfo(info, node.info);
         }
+        this.readExtensions(json, node);
     }
 
     public void readInfo(Object json, AaiInfo node) {
@@ -47,6 +64,8 @@ public class AaiReader {
         node.title = title;
         node.version = version;
         node.description = description;
+
+        this.readExtensions(json, node);
     }
     
 }

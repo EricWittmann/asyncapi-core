@@ -1,6 +1,10 @@
 package io.apicurio.asyncapi.core.visitors;
 
+import java.util.Collection;
+
 import io.apicurio.asyncapi.core.models.AaiDocument;
+import io.apicurio.asyncapi.core.models.AaiExtensibleNode;
+import io.apicurio.asyncapi.core.models.AaiExtension;
 import io.apicurio.asyncapi.core.models.AaiInfo;
 import io.apicurio.asyncapi.core.models.AaiNode;
 
@@ -15,6 +19,26 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	public AaiTraverser(IAaiNodeVisitor visitor) {
 		this.visitor = visitor;
 	}
+
+    /**
+     * Traverse the items of the given array.
+     * @param items
+     */
+    protected void traverseCollection(Collection<? extends AaiNode> items) {
+        if (items != null) {
+            for (AaiNode node : items) {
+                this.traverseIfNotNull(node);
+            }
+        }
+    }
+
+    /**
+     * Traverse the extension nodes, if any are found.
+     * @param node
+     */
+    protected void traverseExtensions(AaiExtensibleNode node) {
+        this.traverseCollection(node.getExtensions());
+    }
 
     /**
      * Called to traverse the data model starting at the given node and traversing
@@ -35,15 +59,31 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
         }
     }
 
+    /**
+     * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitDocument(io.apicurio.asyncapi.core.models.AaiDocument)
+     */
 	@Override
 	public void visitDocument(AaiDocument node) {
 		node.accept(this.visitor);
 		this.traverseIfNotNull(node.info);
+		this.traverseExtensions(node);
 	}
 
+	/**
+	 * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitInfo(io.apicurio.asyncapi.core.models.AaiInfo)
+	 */
 	@Override
 	public void visitInfo(AaiInfo node) {
 		node.accept(this.visitor);
+        this.traverseExtensions(node);
+	}
+	
+	/**
+	 * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitExtension(io.apicurio.asyncapi.core.models.AaiExtension)
+	 */
+	@Override
+	public void visitExtension(AaiExtension node) {
+	    node.accept(this.visitor);
 	}
 
 }
