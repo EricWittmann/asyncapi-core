@@ -21,7 +21,7 @@
 import {AaiDocument} from "../src/io/apicurio/asyncapi/core/models/AaiDocument";
 import {AaiReader} from "../src/io/apicurio/asyncapi/core/io/readers/AaiReader";
 import {AaiWriter} from "../src/io/apicurio/asyncapi/core/io/writers/AaiWriter";
-import {AaiVisitorUtil} from "../src/io/apicurio/asyncapi/core/visitors/AaiVisitorUtil";
+import {AaiLibrary} from "../src/io/apicurio/asyncapi/core/AaiLibrary";
 
 
 export interface TestSpec {
@@ -59,12 +59,13 @@ describe("Full I/O", () => {
         it(spec.name, () => {
             let testPath: string = "tests/fixtures/io/" + spec.test;
             let json: any = readJSON(testPath);
+            expect(json).not.toBeNull();
             let reader: AaiReader = new AaiReader();
             let document: AaiDocument = new AaiDocument();
             reader.readDocument(json, document);
 
             let writer: AaiWriter = new AaiWriter();
-            AaiVisitorUtil.visitTree(document, writer);
+            AaiLibrary.visitTree(document, writer);
             let jsObj: any = writer.getResult();
             expect(jsObj).toEqual(json);
         });

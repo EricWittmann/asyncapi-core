@@ -7,6 +7,8 @@ import io.apicurio.asyncapi.core.models.AaiExtensibleNode;
 import io.apicurio.asyncapi.core.models.AaiExtension;
 import io.apicurio.asyncapi.core.models.AaiInfo;
 import io.apicurio.asyncapi.core.models.AaiNode;
+import io.apicurio.asyncapi.core.models.IAaiVisitable;
+import io.apicurio.asyncapi.core.validation.AaiValidationProblem;
 
 public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	
@@ -24,9 +26,9 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
      * Traverse the items of the given array.
      * @param items
      */
-    protected void traverseCollection(Collection<? extends AaiNode> items) {
+    protected void traverseCollection(Collection<? extends IAaiVisitable> items) {
         if (items != null) {
-            for (AaiNode node : items) {
+            for (IAaiVisitable node : items) {
                 this.traverseIfNotNull(node);
             }
         }
@@ -38,6 +40,14 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
      */
     protected void traverseExtensions(AaiExtensibleNode node) {
         this.traverseCollection(node.getExtensions());
+    }
+
+    /**
+     * Traverse the validation problems, if any are found.
+     * @param node
+     */
+    protected void traverseValidationProblems(AaiNode node) {
+        this.traverseCollection(node.getValidationProblems());
     }
 
     /**
@@ -53,7 +63,7 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
      * Traverse into the given node, unless it's null.
      * @param node
      */
-    protected void traverseIfNotNull(AaiNode node) {
+    protected void traverseIfNotNull(IAaiVisitable node) {
         if (node != null) {
             node.accept(this);
         }
@@ -66,7 +76,8 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	public void visitDocument(AaiDocument node) {
 		node.accept(this.visitor);
 		this.traverseIfNotNull(node.info);
-		this.traverseExtensions(node);
+        this.traverseExtensions(node);
+        this.traverseValidationProblems(node);
 	}
 
 	/**
@@ -76,6 +87,7 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	public void visitInfo(AaiInfo node) {
 		node.accept(this.visitor);
         this.traverseExtensions(node);
+        this.traverseValidationProblems(node);
 	}
 	
 	/**
@@ -84,6 +96,15 @@ public class AaiTraverser implements IAaiTraverser, IAaiNodeVisitor {
 	@Override
 	public void visitExtension(AaiExtension node) {
 	    node.accept(this.visitor);
+        this.traverseValidationProblems(node);
 	}
+
+    /**
+     * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitValidationProblem(io.apicurio.asyncapi.core.validation.AaiValidationProblem)
+     */
+    @Override
+    public void visitValidationProblem(AaiValidationProblem problem) {
+        problem.accept(this.visitor);
+    }
 
 }

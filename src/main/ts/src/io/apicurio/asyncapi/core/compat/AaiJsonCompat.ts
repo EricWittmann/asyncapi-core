@@ -1,5 +1,5 @@
 
-export class AaiJsonUtil {
+export class AaiJsonCompat {
     
     public static objectNode(): any {
         return {};
@@ -24,7 +24,7 @@ export class AaiJsonUtil {
     }
     
     public static propertyString(json: any, propertyName: string): string {
-        let value: any = AaiJsonUtil.property(json, propertyName);
+        let value: any = AaiJsonCompat.property(json, propertyName);
         if (value == null) {
             return null;
         } else {
@@ -38,7 +38,7 @@ export class AaiJsonUtil {
     
     public static setPropertyString(json: any, propertyName: string, propertyValue: string): void {
         if (propertyValue != null) {
-            AaiJsonUtil.setProperty(json, propertyName, propertyValue);
+            AaiJsonCompat.setProperty(json, propertyName, propertyValue);
         }
     }
 

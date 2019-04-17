@@ -18,7 +18,7 @@ package io.apicurio.asyncapi.core.io.readers;
 
 import java.util.List;
 
-import io.apicurio.asyncapi.core.compat.AaiJsonUtil;
+import io.apicurio.asyncapi.core.compat.AaiJsonCompat;
 import io.apicurio.asyncapi.core.io.AaiConstants;
 import io.apicurio.asyncapi.core.models.AaiDocument;
 import io.apicurio.asyncapi.core.models.AaiExtensibleNode;
@@ -31,21 +31,21 @@ import io.apicurio.asyncapi.core.models.AaiInfo;
 public class AaiReader {
     
     private void readExtensions(Object json, AaiExtensibleNode node) {
-        List<String> keys = AaiJsonUtil.keys(json);
+        List<String> keys = AaiJsonCompat.keys(json);
         for (String key : keys) {
             if (key.startsWith(AaiConstants.EXTENSION_PREFIX)) {
                 AaiExtension extension = node.createExtension();
                 extension.name = key;
-                extension.value = AaiJsonUtil.property(json, key);
+                extension.value = AaiJsonCompat.property(json, key);
                 node.addExtension(key, extension);
             }
         }
     }
 
     public void readDocument(Object json, AaiDocument node) {
-        String asyncapi = AaiJsonUtil.propertyString(json, AaiConstants.PROP_ASYNCAPI);
-        String id = AaiJsonUtil.propertyString(json, AaiConstants.PROP_ID);
-        Object info = AaiJsonUtil.property(json, AaiConstants.PROP_INFO);
+        String asyncapi = AaiJsonCompat.propertyString(json, AaiConstants.PROP_ASYNCAPI);
+        String id = AaiJsonCompat.propertyString(json, AaiConstants.PROP_ID);
+        Object info = AaiJsonCompat.property(json, AaiConstants.PROP_INFO);
         
         node.asyncapi = asyncapi;
         node.id = id;
@@ -57,9 +57,9 @@ public class AaiReader {
     }
 
     public void readInfo(Object json, AaiInfo node) {
-        String title = AaiJsonUtil.propertyString(json, AaiConstants.PROP_TITLE);
-        String version = AaiJsonUtil.propertyString(json, AaiConstants.PROP_VERSION);
-        String description = AaiJsonUtil.propertyString(json, AaiConstants.PROP_DESCRIPTION);
+        String title = AaiJsonCompat.propertyString(json, AaiConstants.PROP_TITLE);
+        String version = AaiJsonCompat.propertyString(json, AaiConstants.PROP_VERSION);
+        String description = AaiJsonCompat.propertyString(json, AaiConstants.PROP_DESCRIPTION);
         
         node.title = title;
         node.version = version;

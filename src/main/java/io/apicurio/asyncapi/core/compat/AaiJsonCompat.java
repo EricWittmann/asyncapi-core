@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 /**
  * @author eric.wittmann@gmail.com
  */
-public class AaiJsonUtil {
+public class AaiJsonCompat {
 
     private static final JsonNodeFactory factory = JsonNodeFactory.instance;
     
@@ -135,7 +135,7 @@ public class AaiJsonUtil {
     }
     
     public static String propertyString(Object json, String propertyName) {
-        JsonNode propertyNode = (JsonNode) AaiJsonUtil.property(json, propertyName);
+        JsonNode propertyNode = (JsonNode) AaiJsonCompat.property(json, propertyName);
         if (propertyNode == null) {
             return null;
         } else {

@@ -19,12 +19,13 @@ package io.apicurio.asyncapi.core.io.writers;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.apicurio.asyncapi.core.compat.AaiJsonUtil;
+import io.apicurio.asyncapi.core.compat.AaiJsonCompat;
 import io.apicurio.asyncapi.core.io.AaiConstants;
 import io.apicurio.asyncapi.core.models.AaiDocument;
 import io.apicurio.asyncapi.core.models.AaiExtension;
 import io.apicurio.asyncapi.core.models.AaiInfo;
 import io.apicurio.asyncapi.core.models.AaiNode;
+import io.apicurio.asyncapi.core.validation.AaiValidationProblem;
 import io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor;
 
 /**
@@ -69,7 +70,7 @@ public class AaiWriter implements IAaiNodeVisitor {
         // If not found, return a throwaway object (this would happen when doing a partial
         // read of a subsection of a document).
         if (rval == null) {
-            return AaiJsonUtil.objectNode();
+            return AaiJsonCompat.objectNode();
         }
         return rval;
     }
@@ -88,9 +89,9 @@ public class AaiWriter implements IAaiNodeVisitor {
      */
     @Override
     public void visitDocument(AaiDocument node) {
-        Object root = AaiJsonUtil.objectNode();
-        AaiJsonUtil.setPropertyString(root, AaiConstants.PROP_ASYNCAPI, node.asyncapi);
-        AaiJsonUtil.setPropertyString(root, AaiConstants.PROP_ID, node.id);
+        Object root = AaiJsonCompat.objectNode();
+        AaiJsonCompat.setPropertyString(root, AaiConstants.PROP_ASYNCAPI, node.asyncapi);
+        AaiJsonCompat.setPropertyString(root, AaiConstants.PROP_ID, node.id);
         
         this.updateIndex(node, root);
     }
@@ -101,11 +102,11 @@ public class AaiWriter implements IAaiNodeVisitor {
     @Override
     public void visitInfo(AaiInfo node) {
         Object parent = this.lookupParentJson(node);
-        Object info = AaiJsonUtil.objectNode();
-        AaiJsonUtil.setPropertyString(info, AaiConstants.PROP_TITLE, node.title);
-        AaiJsonUtil.setPropertyString(info, AaiConstants.PROP_VERSION, node.version);
-        AaiJsonUtil.setPropertyString(info, AaiConstants.PROP_DESCRIPTION, node.description);
-        AaiJsonUtil.setProperty(parent, AaiConstants.PROP_INFO, info);
+        Object info = AaiJsonCompat.objectNode();
+        AaiJsonCompat.setPropertyString(info, AaiConstants.PROP_TITLE, node.title);
+        AaiJsonCompat.setPropertyString(info, AaiConstants.PROP_VERSION, node.version);
+        AaiJsonCompat.setPropertyString(info, AaiConstants.PROP_DESCRIPTION, node.description);
+        AaiJsonCompat.setProperty(parent, AaiConstants.PROP_INFO, info);
 
         this.updateIndex(node, info);
     }
@@ -116,7 +117,15 @@ public class AaiWriter implements IAaiNodeVisitor {
     @Override
     public void visitExtension(AaiExtension node) {
         Object parent = this.lookupParentJson(node);
-        AaiJsonUtil.setProperty(parent, node.name, node.value);
+        AaiJsonCompat.setProperty(parent, node.name, node.value);
+    }
+
+    /**
+     * @see io.apicurio.asyncapi.core.visitors.IAaiNodeVisitor#visitValidationProblem(io.apicurio.asyncapi.core.validation.AaiValidationProblem)
+     */
+    @Override
+    public void visitValidationProblem(AaiValidationProblem problem) {
+        // Validation problems are not written out, obviously.
     }
 
 }

@@ -14,48 +14,22 @@
  * limitations under the License.
  */
 
-package io.apicurio.asyncapi.core.io;
+package io.apicurio.asyncapi.core.validation;
+
+import io.apicurio.asyncapi.core.models.AaiNode;
+import io.apicurio.asyncapi.core.visitors.AaiAllNodeVisitor;
 
 /**
  * @author eric.wittmann@gmail.com
  */
-public class FullIOTest {
-
-    private String name;
-    private String test;
+public class AaiResetValidationProblemsVisitor extends AaiAllNodeVisitor {
     
     /**
-     * Constructor.
+     * @see io.apicurio.asyncapi.core.visitors.AaiAllNodeVisitor#visitNode(io.apicurio.asyncapi.core.models.AaiNode)
      */
-    public FullIOTest() {
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the test
-     */
-    public String getTest() {
-        return test;
-    }
-
-    /**
-     * @param test the test to set
-     */
-    public void setTest(String test) {
-        this.test = test;
+    @Override
+    protected void visitNode(AaiNode node) {
+        node.clearValidationProblems();
     }
 
 }

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package io.apicurio.asyncapi.core.io;
+package io.apicurio.asyncapi.core.validation;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,16 +39,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.apicurio.asyncapi.core.AaiLibrary;
 import io.apicurio.asyncapi.core.io.readers.AaiReader;
-import io.apicurio.asyncapi.core.io.writers.AaiWriter;
 import io.apicurio.asyncapi.core.models.AaiDocument;
 
 /**
  * @author eric.wittmann@gmail.com
  */
-public class IoTestRunner extends ParentRunner<IoTestCase> {
+public class ValidationTestRunner extends ParentRunner<ValidationTestCase> {
 
     private Class<?> testClass;
-    private List<IoTestCase> children;
+    private List<ValidationTestCase> children;
     private ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -55,23 +55,23 @@ public class IoTestRunner extends ParentRunner<IoTestCase> {
      * @param testClass
      * @throws InitializationError
      */
-    public IoTestRunner(Class<?> testClass) throws InitializationError {
+    public ValidationTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
         this.testClass = testClass;
         this.children = loadTests();
     }
 
-    private List<IoTestCase> loadTests() throws InitializationError {
+    private List<ValidationTestCase> loadTests() throws InitializationError {
         try {
-            List<IoTestCase> allTests = new LinkedList<>();
+            List<ValidationTestCase> allTests = new LinkedList<>();
             
-            URL testsJsonUrl = Thread.currentThread().getContextClassLoader().getResource("fixtures/io/tests.json");
+            URL testsJsonUrl = Thread.currentThread().getContextClassLoader().getResource("fixtures/validation/tests.json");
             String testsJsonSrc = IOUtils.toString(testsJsonUrl, "UTF-8");
             JsonNode tree = mapper.readTree(testsJsonSrc);
             ArrayNode tests = (ArrayNode) tree;
             tests.forEach( test -> {
                 ObjectNode testNode = (ObjectNode) test;
-                IoTestCase fit = new IoTestCase();
+                ValidationTestCase fit = new ValidationTestCase();
                 fit.setName(testNode.get("name").asText());
                 fit.setTest(testNode.get("test").asText());
                 allTests.add(fit);
@@ -87,7 +87,7 @@ public class IoTestRunner extends ParentRunner<IoTestCase> {
      * @see org.junit.runners.ParentRunner#getChildren()
      */
     @Override
-    protected List<IoTestCase> getChildren() {
+    protected List<ValidationTestCase> getChildren() {
         return children;
     }
 
@@ -95,7 +95,7 @@ public class IoTestRunner extends ParentRunner<IoTestCase> {
      * @see org.junit.runners.ParentRunner#describeChild(java.lang.Object)
      */
     @Override
-    protected Description describeChild(IoTestCase child) {
+    protected Description describeChild(ValidationTestCase child) {
         return Description.createTestDescription(this.testClass, child.getName());
     }
 
@@ -103,14 +103,14 @@ public class IoTestRunner extends ParentRunner<IoTestCase> {
      * @see org.junit.runners.ParentRunner#runChild(java.lang.Object, org.junit.runner.notification.RunNotifier)
      */
     @Override
-    protected void runChild(IoTestCase child, RunNotifier notifier) {
+    protected void runChild(ValidationTestCase child, RunNotifier notifier) {
         Description description = this.describeChild(child);
         Statement statement = new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                String testCP = "fixtures/io/" + child.getTest();
+                String testCP = "fixtures/validation/" + child.getTest();
                 URL testUrl = Thread.currentThread().getContextClassLoader().getResource(testCP);
-                Assert.assertNotNull(testUrl);
+                Assert.assertNotNull("Could not load test resource: " + testCP, testUrl);
 
                 // Read the test source
                 String original = loadResource(testUrl);
@@ -123,19 +123,51 @@ public class IoTestRunner extends ParentRunner<IoTestCase> {
                 AaiReader reader = new AaiReader();
                 reader.readDocument(originalParsed, doc);
                 
-                // Use the AaiWriter to write the data model back to JSON
-                AaiWriter writer = new AaiWriter();
-                AaiLibrary.visitTree(doc, writer);
-                Object roundTripJs = writer.getResult();
-                Assert.assertNotNull(roundTripJs);
+                List<AaiValidationProblem> problems = AaiLibrary.validate(doc, null);
+                String actual = formatProblems(problems);
+                String expectedCP = testCP + ".expected";
+                URL expectedUrl = Thread.currentThread().getContextClassLoader().getResource(expectedCP);
+                Assert.assertNotNull("Could not load test resource: " + expectedCP, expectedUrl);
+                String expected = loadResource(expectedUrl);
                 
-                // Stringify the round trip object
-                String roundTrip = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(roundTripJs);
-                Assert.assertNotNull(roundTrip);
-                assertJsonEquals(original, roundTrip);
+                Assert.assertEquals(normalize(expected), normalize(actual));
             }
         };
         runLeaf(statement, description, notifier);
+    }
+
+    /**
+     * @param expected
+     */
+    protected String normalize(String value) {
+        return value.trim().replace("\r\n", "\n");
+    }
+
+    /**
+     * Format the list of problems as a string.
+     * @param problems
+     */
+    protected String formatProblems(List<AaiValidationProblem> problems) {
+        StringBuilder builder = new StringBuilder();
+        problems.sort(new Comparator<AaiValidationProblem>() {
+            @Override
+            public int compare(AaiValidationProblem o1, AaiValidationProblem o2) {
+                int rval = o1.errorCode.compareTo(o2.errorCode);
+                return rval;
+            }
+        });
+        problems.forEach(problem -> {
+            builder.append(problem.errorCode);
+            builder.append("::");
+            builder.append(problem.severity);
+            builder.append("::");
+            builder.append(problem.property);
+            builder.append("::");
+            builder.append(problem.message);
+            builder.append("\n");
+            // TODO include the node path in this!
+        });
+        return builder.toString();
     }
 
     /**
